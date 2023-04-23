@@ -1,0 +1,9 @@
+scipy
+numpy
+numba
+aerosandbox
+matplotlib
+pandas
+ray[tune]
+optuna
+svgpathtools

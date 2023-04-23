@@ -1,0 +1,8 @@
+include ':FtcRobotController'
+include ':hardware-dependent'
+include ':hardware-independent'
+// include ':client-plugin'
+include ':api'
+
+include ':mpc'
+

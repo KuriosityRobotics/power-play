@@ -1,0 +1,155 @@
+import java.text.SimpleDateFormat
+
+//
+// build.gradle in FtcRobotController
+//
+apply plugin: 'com.android.application'
+
+android {
+
+    defaultConfig {
+        minSdkVersion 23
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 28
+        buildConfigField "String", "APP_BUILD_TIME", '"' + (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ROOT).format(new Date())) + '"'
+    }
+
+    compileSdkVersion 29
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    namespace = 'com.qualcomm.ftcrobotcontroller'
+}
+
+dependencies {
+	implementation project(':hardware-dependent')
+}
+
+import java.util.regex.Pattern
+
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 30
+
+    signingConfigs {
+        release {
+            def apkStoreFile = System.getenv("APK_SIGNING_STORE_FILE")
+            if (apkStoreFile != null) {
+                keyAlias System.getenv("APK_SIGNING_KEY_ALIAS")
+                keyPassword System.getenv("APK_SIGNING_KEY_PASSWORD")
+                storeFile file(System.getenv("APK_SIGNING_STORE_FILE"))
+                storePassword System.getenv("APK_SIGNING_STORE_PASSWORD")
+            } else {
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+                storeFile rootProject.file('libs/ftc.debug.keystore')
+                storePassword 'android'
+            }
+        }
+
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile rootProject.file('libs/ftc.debug.keystore')
+            storePassword 'android'
+        }
+    }
+
+    aaptOptions {
+        noCompress "tflite"
+    }
+
+
+    configurations {
+        all*.exclude group: 'org.slf4j', module: 'slf4j-api'
+        all*.exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared", "-DANDROID_ARM_NEON=TRUE"
+            }
+        }
+
+
+        signingConfig signingConfigs.debug
+        applicationId 'com.qualcomm.ftcrobotcontroller'
+        minSdkVersion 25
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 30
+
+        /**
+         * We keep the versionCode and versionName of robot controller applications in sync with
+         * the master information published in the AndroidManifest.xml file of the FtcRobotController
+         * module. This helps avoid confusion that might arise from having multiple versions of
+         * a robot controller app simultaneously installed on a robot controller device.
+         *
+         * We accomplish this with the help of a funky little Groovy script that maintains that
+         * correspondence automatically.
+         *
+         * @see <a href="http://developer.android.com/tools/building/configuring-gradle.html">Configure Your Build</a>
+         * @see <a href="http://developer.android.com/tools/publishing/versioning.html">Versioning Your App</a>
+         */
+        def manifestFile = project(':FtcRobotController').file('src/main/AndroidManifest.xml');
+        def manifestText = manifestFile.getText()
+        //
+        def vCodePattern = Pattern.compile("versionCode=\"(\\d+(\\.\\d+)*)\"")
+        def matcher = vCodePattern.matcher(manifestText)
+        matcher.find()
+        def vCode = Integer.parseInt(matcher.group(1))
+        //
+        def vNamePattern = Pattern.compile("versionName=\"(.*)\"")
+        matcher = vNamePattern.matcher(manifestText);
+        matcher.find()
+        def vName = matcher.group(1)
+        //
+        versionCode vCode
+        versionName vName
+    }
+
+    // Advanced user code might just want to use Vuforia directly, so we set up the libs as needed
+    // http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.BuildType.html
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    packagingOptions {
+        pickFirst '**/*.so'
+    }
+    sourceSets.main {
+        jni.srcDirs = []
+        jniLibs.srcDir rootProject.file('libs')
+    }
+    ndkVersion '21.3.6528147'
+}
+
+repositories {
+    flatDir {
+        dirs rootProject.file('libs')
+    }
+}
+
+apply from: '../build.dependencies.gradle'

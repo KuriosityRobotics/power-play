@@ -1,0 +1,131 @@
+//
+// build.gradle in hardware-dependent
+//
+// Most of the definitions for building your module reside in a common, shared
+// file 'build.common.gradle'. Being factored in this way makes it easier to
+// integrate updates to the FTC into your code. If you really need to customize
+// the build definitions, you can place those customizations in this file, but
+// please think carefully as to whether such customizations are really necessary
+// before doing so.
+
+
+// Custom definitions may go here
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
+// Include common definitions from above.
+plugins {
+	id('com.android.library')
+	id "com.diffplug.spotless" version "6.9.1"
+	id 'org.bytedeco.gradle-javacpp-build' version "$javacppVersion"
+}
+apply from: '../build.dependencies.gradle'
+
+ext {
+	javacppPlatform = 'android-arm64'
+}
+
+repositories {
+	maven { url 'https://jitpack.io' }
+	maven { url = 'https://maven.brott.dev/' }
+	mavenCentral()
+
+}
+
+android {
+	namespace = 'com.kuriosityrobotics.powerplay'
+	testOptions {
+		unitTests.returnDefaultValues = true
+
+		unitTests.all {
+			useJUnitPlatform()
+		}
+	}
+	defaultConfig {
+		minSdkVersion 25
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
+        }
+    }
+
+	compileSdkVersion 30
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_11
+		targetCompatibility JavaVersion.VERSION_11
+	}
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
+}
+
+dependencies {
+	implementation project(':hardware-independent')
+	implementation project(':api')
+	implementation project(':mpc')
+
+	implementation 'org.ojalgo:ojalgo:51.1.0'
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+	testImplementation "org.mockito:mockito-inline:4.7.0"
+
+	annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+
+	implementation 'org.openpnp:opencv:4.5.1-2'
+
+	implementation 'com.acmerobotics.dashboard:dashboard:0.4.7'
+	implementation 'org.openftc:apriltag:1.1.1'
+
+	implementation group: 'org.bytedeco', name: 'javacpp', version: "$javacppVersion"
+}
+
+android.libraryVariants.all { variant ->
+	def variantName = variant.name.capitalize() // either "Debug" or "Release"
+	def javaCompile = project.tasks.getByName("compile${variantName}JavaWithJavac")
+	def configureCMake = project.tasks.findAll {
+		it.name.startsWith("configureCMake$variantName")
+	}
+
+	task "javacppCompileJava$variantName"(type: JavaCompile) {
+		include 'com/kuriosityrobotics/powerplay/hardware/drivers/ICM20948Config.java'
+		source = javaCompile.source
+		classpath = javaCompile.classpath
+		destinationDir = javaCompile.destinationDir
+	}
+
+	task "javacppBuildParser$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+		dependsOn "javacppCompileJava$variantName"
+		classPath = [javaCompile.destinationDir]
+		includePath =  ["$projectDir/src/main/cpp"]
+		classOrPackageNames = ['com.kuriosityrobotics.powerplay.hardware.drivers.ICM20948Config']
+		outputDirectory = file("$projectDir/src/main/java/")
+	}
+
+	// Compiles NativeLibrary.java and everything else
+	javaCompile.dependsOn "javacppBuildParser$variantName"
+
+	// Generates jnijavacpp.cpp and jniNativeLibrary.cpp
+	task "javacppBuildCompiler$variantName"(type: org.bytedeco.gradle.javacpp.BuildTask) {
+		dependsOn javaCompile
+		classPath = [javaCompile.destinationDir]
+		classOrPackageNames = ['com.kuriosityrobotics.powerplay.hardware.drivers.ICM20948_gen']
+		compile = false
+		deleteJniFiles = false
+		outputDirectory = file("$projectDir/src/main/cpp/")
+	}
+
+	// Picks up the C++ files listed in CMakeLists.txt
+	configureCMake.forEach {
+		it.dependsOn "javacppBuildCompiler$variantName"
+	}
+}
+
+apply from: '../spotless.gradle'

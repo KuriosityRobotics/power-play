@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
+}
+
+
+repositories {
+    mavenCentral()
+
+	flatDir {
+		dirs '../libs/arm64-v8a', '../libs/armeabi-v7a'
+	}
+}
+
+dependencies {
+	implementation project(':api')
+	implementation 'org.apache.commons:commons-math3:3.6.1'
+	implementation 'org.apache.commons:commons-csv:1.10.0'
+
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+	useJUnitPlatform()
+	jvmArgs '-Djava.library.path=../libs/arm64-v8a:../libs/armeabi-v7a'
+}
+
+tasks.withType(JavaExec).configureEach {
+	if (name.endsWith("main()")) {
+		notCompatibleWithConfigurationCache("JavaExec created by IntelliJ")
+	}
+}

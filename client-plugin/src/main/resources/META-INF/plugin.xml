@@ -1,0 +1,40 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.kuriosityrobotics.client.client-plugin</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>ClientPlugin</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="chop@quenda.net" url="https://kuriosityrobotics.com">Kuriosity Robotics</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    robot client.  this is filler text becausse
+    intellij won't let me build it unless
+    this description is more than 40 characters lol
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow factoryClass="com.kuriosityrobotics.powerplay.client.telemetry.TelemetryToolWindowFactory" id="Telemetry"/>
+        <toolWindow factoryClass="com.kuriosityrobotics.powerplay.client.deployment.NodeDeploymentFactory" id="Nodes"/>
+        <toolWindow factoryClass="com.kuriosityrobotics.powerplay.client.camera.CameraViewFactory" id="Cameras"/>
+        <toolWindow factoryClass="com.kuriosityrobotics.powerplay.client.logs.LogViewFactory" id="Logging"/>
+        <toolWindow factoryClass="com.kuriosityrobotics.powerplay.client.field.FieldFactory" id="Field"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="com.kuriosityrobotics.powerplay.client.DynamicReloadListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+    </applicationListeners>
+
+</idea-plugin>

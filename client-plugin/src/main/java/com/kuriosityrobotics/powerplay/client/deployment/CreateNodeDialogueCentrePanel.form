@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.kuriosityrobotics.powerplay.client.deployment.CreateNodeDialogueCentrePanel">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="634" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="d23ba" class="javax.swing.JTextField" binding="nodeNameTextField" default-binding="true">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="4f4bc" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="0" left="15" bottom="0" right="20" weightx="0.3" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <labelFor value="d23ba"/>
+          <text value="Node name"/>
+        </properties>
+      </component>
+      <component id="16e45" class="com.intellij.openapi.ui.ComboBox" binding="nodeTypeBox" custom-create="true">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="3c670" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="0" left="15" bottom="0" right="20" weightx="0.3" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <labelFor value="16e45"/>
+          <text value="Node type"/>
+        </properties>
+      </component>
+      <component id="4a17d" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag top="0" left="15" bottom="0" right="20" weightx="0.3" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <labelFor value="e0c06"/>
+          <text value="Target robot"/>
+        </properties>
+      </component>
+      <component id="e0c06" class="com.intellij.openapi.ui.ComboBox" binding="robotDeploymentBox" custom-create="true">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+    </children>
+  </grid>
+</form>
